@@ -1,0 +1,143 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.21022</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{7FF4E046-9229-43F7-8F12-945510FEC0BB}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>CreamCheese</RootNamespace>
+    <AssemblyName>ConstraintParser</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <TargetFrameworkProfile />
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+  <Target Name="GenerateParsers" Inputs="@(GenerateParser)" Outputs="@(GenerateParser->'%(Filename).cs')">
+    <Exec Command="gppg.exe /gplex @(GenerateParser) &gt; ConstraintParser\%(GenerateParser.Filename).cs" />
+    <Touch Files="ConstraintParser\%(GenerateParser.Filename).cs" />
+  </Target>
+  <Target Name="GenerateScanners" Inputs="@(GenerateScanner)" Outputs="@(GenerateScanner->'%(Filename).cs')">
+    <Exec Command="gplex.exe /out:ConstraintParser\%(GenerateScanner.Filename).cs @(GenerateScanner)" />
+    <Touch Files="ConstraintParser\%(GenerateScanner.Filename).cs" />
+  </Target>
+  <ItemGroup>
+    <Compile Include="Cell.cs" />
+    <Compile Include="ConstraintParser\ExpressionTreeEnumerable.cs" />
+    <Compile Include="ConstraintParser\ExpressionTreeEnumerator.cs" />
+    <Compile Include="ConstraintParser\ExpressionTreeNode.cs" />
+    <Compile Include="ConstraintParser\ExpressionTree.cs" />
+    <Compile Include="ConstraintParser\FunctionToken.cs" />
+    <Compile Include="ConstraintParser\IToken.cs" />
+    <Compile Include="ConstraintParser\NumberToken.cs" />
+    <Compile Include="ConstraintParser\OperatorToken.cs" />
+    <Compile Include="ConstraintParser\RangeToken.cs" />
+    <Compile Include="ConstraintParser\ShiftReduceParserCode.cs" />
+    <Compile Include="ConstraintParser\StringToken.cs" />
+    <Compile Include="ConstraintParser\TokenType.cs" />
+    <Compile Include="ConstraintParser\UnknownToken.cs" />
+    <Compile Include="CspItemType.cs" />
+    <Compile Include="VariableCspItem.cs" />
+    <Compile Include="ConstraintCspItem.cs" />
+    <Compile Include="ICspItem.cs" />
+    <Compile Include="NumberCspItem.cs" />
+    <GenerateParser Include="ConstraintParser\Parser.y" />
+    <Compile Include="ConstraintParser\Parser.cs">
+      <DependentUpon>Parser.y</DependentUpon>
+    </Compile>
+    <GenerateScanner Include="ConstraintParser\Scanner.lex" />
+    <Compile Include="ConstraintParser\Scanner.cs">
+      <DependentUpon>Scanner.lex</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="CreamCheese.cs" />
+  </ItemGroup>
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <BuildDependsOn>GenerateParsers;$(BuildDependsOn)</BuildDependsOn>
+    <BuildDependsOn>GenerateScanners;$(BuildDependsOn)</BuildDependsOn>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Windows.Forms" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Cream\Cream.csproj">
+      <Project>{D915FB60-2389-4DE1-BFA3-6D2BA30ACE0A}</Project>
+      <Name>Cream</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+</Project>
