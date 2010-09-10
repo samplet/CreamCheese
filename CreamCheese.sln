@@ -1,6 +1,5 @@
-
-Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual Studio 2008
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CreamCheese", "src\main\CreamCheese\CreamCheese.csproj", "{7FF4E046-9229-43F7-8F12-945510FEC0BB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Excream", "src\main\Excream\Excream.csproj", "{079E4D08-2696-4B4C-93CF-225C732088B7}"
