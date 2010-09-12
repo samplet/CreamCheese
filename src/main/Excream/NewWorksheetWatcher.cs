@@ -12,6 +12,8 @@ namespace Excream {
             ActivateSheetWatcher activateWatcher = new ActivateSheetWatcher();
             Globals.Worksheets.Add(activateWatcher.Index, ws);
             ((Excel.DocEvents_Event) ws).Activate += new Excel.DocEvents_ActivateEventHandler(activateWatcher.Activate);
+            DeactivateSheetWatcher deactivateWatcher = new DeactivateSheetWatcher(ws);
+            ((Excel.DocEvents_Event) ws).Deactivate += new Excel.DocEvents_DeactivateEventHandler(deactivateWatcher.Deactivate);
 
             foreach(Excel.Range r in ws.UsedRange) {
                 if((string) r.Formula != "") {

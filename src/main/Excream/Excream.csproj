@@ -64,6 +64,8 @@
     <Compile Include="ActivateSheetWatcher.cs" />
     <Compile Include="ChangeWatcher.cs" />
     <Compile Include="ActivateBookWatcher.cs" />
+    <Compile Include="DeactivateSheetWatcher.cs" />
+    <Compile Include="DeleteSheetWatcher.cs" />
     <Compile Include="Functions.cs" />
     <Compile Include="Globals.cs" />
     <Compile Include="IFunctions.cs" />
