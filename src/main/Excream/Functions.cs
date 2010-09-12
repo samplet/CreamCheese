@@ -17,17 +17,6 @@ namespace Excream {
 
         #region IFunctions
 
-/*        object IFunctions.CONSTRAIN(object constraint1, [Optional] object constraint2, [Optional] object constraint3,
-                         [Optional] object constraint4, [Optional] object constraint5, [Optional] object constraint6,
-                         [Optional] object constraint7, [Optional] object constraint8, [Optional] object constraint9,
-                         [Optional] object constraint10, [Optional] object constraint11, [Optional] object constraint12,
-                         [Optional] object constraint13, [Optional] object constraint14, [Optional] object constraint15,
-                         [Optional] object constraint16, [Optional] object constraint17, [Optional] object constraint18,
-                         [Optional] object constraint19, [Optional] object constraint20, [Optional] object constraint21,
-                         [Optional] object constraint22, [Optional] object constraint23, [Optional] object constraint24,
-                         [Optional] object constraint25, [Optional] object constraint26, [Optional] object constraint27,
-                         [Optional] object constraint28, [Optional] object constraint29, [Optional] object constraint30,
-                         [Optional] object constraint31, [Optional] object constraint32) {*/
         object IFunctions.CONSTRAIN(string constraints) {
             object caller = Globals.Application.get_Caller(Type.Missing);
             if(!(caller is Excel.Range)) {
@@ -37,8 +26,14 @@ namespace Excream {
             Excel.Range range = (Excel.Range) caller;
             string address = range.get_Address((object) false, (object) false, Excel.XlReferenceStyle.xlA1, (object) false, Type.Missing);
             string key = Globals.WorkbookIndex + "." + Globals.WorksheetIndex + "." + address;
+
+            /* 
+             * Since we cannot have circular references, we must build our own formula
+             * based on the string of constraints passed to the function.
+             */
             //string formula = Globals.FixFormula((string) range.Formula);
             string formula = "CONSTRAIN(" + constraints + ")";
+
             Globals.ConstraintSolver.Add(key, formula);
             object returnValue = Globals.ConstraintSolver.GetValue(key);
             if(returnValue != null) {
@@ -52,8 +47,10 @@ namespace Excream {
 
         #region IDTExtensibility2
 
-        /* This code grabs a copy of the application object for future use.
-           It is from [ http://www.time4tea.net/wiki/display/MAIN/Writing+an+Excel+COM+AddIn ]. */
+        /*
+         * This code grabs a copy of the application object for future use.
+         * It is from [ http://www.time4tea.net/wiki/display/MAIN/Writing+an+Excel+COM+AddIn ].
+         */
 
         public void OnAddInsUpdate(ref Array custom) {
         }
@@ -82,9 +79,11 @@ namespace Excream {
 
         #region COM Register Code
 
-        /* Here we register the class for Excel to discover. See
-           [ http://blogs.msdn.com/b/eric_carter/archive/2004/12/01/273127.aspx ] for
-           details. */
+        /*
+         * Here we register the class for Excel to discover. See
+         * [ http://blogs.msdn.com/b/eric_carter/archive/2004/12/01/273127.aspx ] for
+         * details.
+         */
 
         [ComRegisterFunctionAttribute]
         public static void RegisterFunction(Type type) {

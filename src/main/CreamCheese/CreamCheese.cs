@@ -62,6 +62,33 @@ namespace CreamCheese {
             _cells.Remove(key);
         }
 
+        public void RemoveBook(string bookKey) {
+            System.Windows.Forms.MessageBox.Show("RemoveBook(" + bookKey + ")");
+            List<string> cellsToRemove = new List<string>();
+            foreach(KeyValuePair<string, Cell> cellKvp in _cells) {
+                if(cellKvp.Key.StartsWith(bookKey)) {
+                    cellsToRemove.Add(cellKvp.Key);
+                }
+            }
+            foreach(string key in cellsToRemove) {
+                _cells.Remove(key);
+            }
+        }
+
+        public void RemoveSheet(string sheetKey) {
+            System.Windows.Forms.MessageBox.Show("RemoveSheet(" + sheetKey + ")");
+            List<string> cellsToRemove = new List<string>();
+            foreach(KeyValuePair<string, Cell> cellKvp in _cells) {
+                string cellSheetKey = cellKvp.Key.Substring(cellKvp.Key.IndexOf('.') + 1);
+                if(cellSheetKey.StartsWith(sheetKey)) {
+                    cellsToRemove.Add(cellKvp.Key);
+                }
+            }
+            foreach(string key in cellsToRemove) {
+                _cells.Remove(key);
+            }
+        }
+
         public object GetValue(string key) {
             System.Windows.Forms.MessageBox.Show("GetValue(" + key + ")");
             if(_lastSolution == null) {
