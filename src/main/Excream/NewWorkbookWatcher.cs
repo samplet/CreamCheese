@@ -12,6 +12,8 @@ namespace Excream {
                 ActivateBookWatcher activateWatcher = new ActivateBookWatcher();
                 Globals.Workbooks.Add(activateWatcher.Index, wb);
                 Globals.Application.WorkbookActivate += new Excel.AppEvents_WorkbookActivateEventHandler(activateWatcher.Activate);
+                DeactivateBookWatcher deactivateWatcher = new DeactivateBookWatcher(wb);
+                wb.Deactivate += new Excel.WorkbookEvents_DeactivateEventHandler(deactivateWatcher.Deactivate);
             } catch(Exception e) {
                 System.Windows.Forms.MessageBox.Show(e.Message);
             }
