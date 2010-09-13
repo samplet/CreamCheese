@@ -5,10 +5,11 @@ namespace Excream {
     class DeactivateSheetWatcher {
 
         private static bool _inDeleteTest = false;
-        private static int _deactivateCount = 0;
+        private int _deactivateCount = 0;
         private Excel.Worksheet _ws;
 
         public DeactivateSheetWatcher(Excel.Worksheet ws) {
+            _deactivateCount = 0;
             _ws = ws;
         }
 
