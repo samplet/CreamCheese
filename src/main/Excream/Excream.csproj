@@ -61,9 +61,7 @@
   </Target>
   -->
   <ItemGroup>
-    <Compile Include="ActivateSheetWatcher.cs" />
     <Compile Include="ChangeWatcher.cs" />
-    <Compile Include="ActivateBookWatcher.cs" />
     <Compile Include="DeleteBookWatcher.cs" />
     <Compile Include="DeactivateBookWatcher.cs" />
     <Compile Include="DeactivateSheetWatcher.cs" />
@@ -73,6 +71,7 @@
     <Compile Include="IFunctions.cs" />
     <Compile Include="NewWorkbookWatcher.cs" />
     <Compile Include="NewWorksheetWatcher.cs" />
+    <Compile Include="ReferenceIdKeeper.cs" />
     <Compile Include="WorkbookOpenWatcher.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -5,14 +5,12 @@ using CC = CreamCheese;
 
 namespace Excream {
 
-    public static class Globals {
+    static class Globals {
 
         private static Excel.Application _application;
         private static CC.CreamCheese _constraintSolver = null;
-        private static int _workbookIndex = 0;
-        private static Dictionary<int, Excel.Workbook> _workbooks = null;
-        private static int _worksheetIndex = 0;
-        private static Dictionary<int, Excel.Worksheet> _worksheets = null;
+        private static ReferenceIdKeeper<Excel.Workbook> _workbooks;
+        private static ReferenceIdKeeper<Excel.Worksheet> _worksheets;
 
         public static Excel.Application Application {
             get {
@@ -32,76 +30,22 @@ namespace Excream {
             }
         }
 
-        public static int WorkbookIndex {
-            get {
-                return _workbookIndex;
-            }
-            set {
-                _workbookIndex = value;
-            }
-        }
-
-        public static Dictionary<int, Excel.Workbook> Workbooks {
+        public static ReferenceIdKeeper<Excel.Workbook> Workbooks {
             get {
                 if(_workbooks == null) {
-                    _workbooks = new Dictionary<int, Excel.Workbook>();
+                    _workbooks = new ReferenceIdKeeper<Excel.Workbook>();
                 }
                 return _workbooks;
             }
         }
 
-        public static int WorksheetIndex {
-            get {
-                return _worksheetIndex;
-            }
-            set {
-                _worksheetIndex = value;
-            }
-        }
-
-        public static Dictionary<int, Excel.Worksheet> Worksheets {
+        public static ReferenceIdKeeper<Excel.Worksheet> Worksheets {
             get {
                 if(_worksheets == null) {
-                    _worksheets = new Dictionary<int, Excel.Worksheet>();
+                    _worksheets = new ReferenceIdKeeper<Excel.Worksheet>();
                 }
                 return _worksheets;
             }
-        }
-
-        public static int GetWorkbookIndex(Excel.Workbook wb) {
-            foreach(KeyValuePair<int, Excel.Workbook> kvp in Globals.Workbooks) {
-                if(wb == kvp.Value) {
-                    return kvp.Key;
-                }
-            }
-            throw new KeyNotFoundException("Could not find workbook");
-        }
-
-        public static int GetWorkbookIndex(string name) {
-            foreach(KeyValuePair<int, Excel.Workbook> kvp in Globals.Workbooks) {
-                if(name == kvp.Value.Name) {
-                    return kvp.Key;
-                }
-            }
-            throw new KeyNotFoundException("Could not find workbook");
-        }
-
-        public static int GetWorksheetIndex(Excel.Worksheet ws) {
-            foreach(KeyValuePair<int, Excel.Worksheet> kvp in Globals.Worksheets) {
-                if(ws == kvp.Value) {
-                    return kvp.Key;
-                }
-            }
-            throw new KeyNotFoundException("Could not find worksheet");
-        }
-
-        public static int GetWorksheetIndex(int workbookIndex, string name) {
-            foreach(Excel.Worksheet ws in Globals.Workbooks[workbookIndex].Worksheets) {
-                if(name == ws.Name) {
-                    return GetWorksheetIndex(ws);
-                }
-            }
-            throw new KeyNotFoundException("Worksheet name does not exist in workbook");
         }
 
         public static string FixFormula(string formula) {
@@ -113,18 +57,18 @@ namespace Excream {
         }
 
         public static string ConvertAddress(string baseAddress, string refAddress) {
-            int workbookIndex;
+            int workbookId;
             string workbook;
             if(refAddress.StartsWith("[")) {
                 int end = refAddress.IndexOf(']');
                 workbook = refAddress.Substring(1, end - 1);
-                workbookIndex = GetWorkbookIndex(workbook);
-                workbook = workbookIndex.ToString();
+                workbookId = Globals.Workbooks[Globals.Application.Workbooks[workbook]];
+                workbook = workbookId.ToString();
                 refAddress = refAddress.Substring(end + 1);
             } else {
                 int end = baseAddress.IndexOf('.');
                 workbook = baseAddress.Substring(0, end);
-                workbookIndex = int.Parse(workbook);
+                workbookId = int.Parse(workbook);
             }
             string worksheet;
             if(refAddress.Contains("!")) {
@@ -133,7 +77,7 @@ namespace Excream {
                 if(worksheet.StartsWith("'")) {
                     worksheet = worksheet.Substring(1, worksheet.Length - 2);
                 }
-                worksheet = GetWorksheetIndex(workbookIndex, worksheet).ToString();
+                worksheet = Globals.Worksheets[Globals.Workbooks[workbookId].Worksheets[worksheet]].ToString();
                 refAddress = refAddress.Substring(end + 1);
             } else {
                 int beginning = baseAddress.IndexOf('.');
@@ -144,14 +88,14 @@ namespace Excream {
         }
 
         public static object GetCellValue(string baseAddress, string refAddress) {
-            int worksheetIndex;
+            int worksheetId;
             string worksheet;
             int beginning = refAddress.IndexOf('.');
             int end = refAddress.LastIndexOf('.');
             worksheet = refAddress.Substring(beginning + 1, end - beginning - 1);
-            worksheetIndex = int.Parse(worksheet);
+            worksheetId = int.Parse(worksheet);
             refAddress = refAddress.Substring(end + 1);
-            return (object) Worksheets[worksheetIndex].get_Range(refAddress).Value;
+            return (object) Globals.Worksheets[worksheetId].get_Range(refAddress).Value;
         }
 
     }

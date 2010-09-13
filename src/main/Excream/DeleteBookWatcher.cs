@@ -7,8 +7,9 @@ namespace Excream {
 
         public static void Delete(Excel.Workbook wb) {
             try {
-                int workbookIndex = Globals.GetWorkbookIndex(wb);
-                Globals.ConstraintSolver.RemoveBook(workbookIndex.ToString());
+                int workbookId = Globals.Workbooks[wb];
+                Globals.ConstraintSolver.RemoveBook(workbookId.ToString());
+                Globals.Workbooks.Remove(workbookId);
             } catch(Exception e) {
                 throw e;
             }

@@ -25,7 +25,7 @@ namespace Excream {
 
             Excel.Range range = (Excel.Range) caller;
             string address = range.get_Address((object) false, (object) false, Excel.XlReferenceStyle.xlA1, (object) false, Type.Missing);
-            string key = Globals.WorkbookIndex + "." + Globals.WorksheetIndex + "." + address;
+            string key = Globals.Workbooks[range.Worksheet.Parent] + "." + Globals.Worksheets[range.Parent] + "." + address;
 
             /* 
              * Since we cannot have circular references, we must build our own formula
