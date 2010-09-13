@@ -71,7 +71,7 @@
     <Compile Include="IFunctions.cs" />
     <Compile Include="NewWorkbookWatcher.cs" />
     <Compile Include="NewWorksheetWatcher.cs" />
-    <Compile Include="ReferenceIdKeeper.cs" />
+    <Compile Include="ReferenceIdKeeper_T.cs" />
     <Compile Include="WorkbookOpenWatcher.cs" />
   </ItemGroup>
   <ItemGroup>
