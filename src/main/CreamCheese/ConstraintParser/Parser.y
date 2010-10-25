@@ -46,10 +46,20 @@ range   :   range1
 range1  :   range2
         |   range1 rangeOp range2
             {
-	      OperatorToken ot =
-		new OperatorToken(OperatorToken.Operator.Range);
-	      $$ = new ExpressionTree(ot, $1, $3);
-	    }
+	        OperatorToken ot =
+		      new OperatorToken(OperatorToken.Operator.Range);
+	          $$ = new ExpressionTree(ot, $1, $3);
+	        }
+		|   NUMBER rangeOp NUMBER
+		    {
+		    OperatorToken ot =
+		      new OperatorToken(OperatorToken.Operator.Range);
+			  RangeToken rt1 = new RangeToken(((NumberToken) $1.Root.Token).Value.ToString());
+			  $1.Root.Token = rt1;
+			  RangeToken rt2 = new RangeToken(((NumberToken) $3.Root.Token).Value.ToString());
+			  $3.Root.Token = rt2;
+	          $$ = new ExpressionTree(ot, $1, $3);
+		    }
         ;
 
 range2  :   rRef
@@ -60,12 +70,12 @@ rRef    :   RREF
         |   RNAME
         |   FIDENT
             {
-	      if($1.Root.Token.Type == TokenType.Unknown) {
-		RangeToken rt =
-		  new RangeToken(((UnknownToken) $1.Root.Token).Value);
-		$$ = new ExpressionTree(rt);
-	      }
-	    }
+	        if($1.Root.Token.Type == TokenType.Unknown) {
+		      RangeToken rt =
+		        new RangeToken(((UnknownToken) $1.Root.Token).Value);
+		      $$ = new ExpressionTree(rt);
+	        }
+	        }
         ;
 
 rangeOp :   RANGE
@@ -172,22 +182,22 @@ expr    :   expr EQ expr
 
 func    :   FIDENT LB RB
             {
-	      if($1.Root.Token.Type == TokenType.Unknown) {
-		FunctionToken ft =
-		  new FunctionToken(((UnknownToken) $1.Root.Token).Value);
-		$$ = new ExpressionTree(ft);
-	      }
-	    }
+	        if($1.Root.Token.Type == TokenType.Unknown) {
+		      FunctionToken ft =
+		        new FunctionToken(((UnknownToken) $1.Root.Token).Value);
+		      $$ = new ExpressionTree(ft);
+	        }
+	        }
         |   FIDENT LB plist RB
-	    {
-	      if($1.Root.Token.Type == TokenType.Unknown) {
-		FunctionToken ft =
-		  new FunctionToken(((UnknownToken) $1.Root.Token).Value,
-				    _tempParamList);
-		$$ = new ExpressionTree(ft);
-	      }
-	      _tempParamList = null;
-	    }
+	        {
+	        if($1.Root.Token.Type == TokenType.Unknown) {
+		      FunctionToken ft =
+		        new FunctionToken(((UnknownToken) $1.Root.Token).Value,
+				                  _tempParamList);
+		        $$ = new ExpressionTree(ft);
+	        }
+	        _tempParamList = null;
+	        }
         ;
 
 plist   :   param

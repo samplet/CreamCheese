@@ -57,7 +57,7 @@ notspace [^ \t\n\v\f\r]
 }
 
 /* Range Reference */
-"$"?[a-zA-Z]+("$"?[0-9]+)? {
+(((\'(\'\'|[^\'])*\')|[^ \t\n\v\f\r\'!]+)!)?("$"?[a-zA-Z]+)("$"?[0-9]+)? {
   yylval = new ExpressionTree(new RangeToken(yytext));
   return (int) Tokens.RREF;
 }

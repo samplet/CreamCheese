@@ -35,11 +35,13 @@ namespace CreamCheese.ConstraintParser {
 
     public override string ToString() {
       string retString = Name + "(";
-      foreach(ExpressionTree eTree in Args) {
-	    retString += eTree.ToString() + ", ";
-      }
-      if(retString.EndsWith(", ")) {
-          retString = retString.Remove(retString.Length - 2);
+      if(Args != null) {
+          foreach(ExpressionTree eTree in Args) {
+              retString += eTree.ToString() + ", ";
+          }
+          if(retString.EndsWith(", ")) {
+              retString = retString.Remove(retString.Length - 2);
+          }
       }
       retString += ")";
       return retString;

@@ -23,8 +23,11 @@ namespace CreamCheese.ConstraintParser {
 
         public ExpressionTree(string expression) {
             Parser p = new Parser(expression);
-            p.Parse();
-            this._root = p.Tree.Root;
+            if(p.Parse()) {
+                this._root = p.Tree.Root;
+            } else {
+                throw new System.ArgumentException("Could not parse expression string");
+            }
         }
 
         public ExpressionTreeNode Root {
