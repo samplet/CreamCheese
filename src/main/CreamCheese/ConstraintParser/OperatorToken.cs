@@ -34,6 +34,12 @@ namespace CreamCheese.ConstraintParser {
       }
     }
 
+    public bool Unary {
+        get {
+            return Value == Operator.Negate || Value == Operator.Percent;
+        }
+    }
+
     TokenType IToken.Type {
       get {
 	return TokenType.Operator;

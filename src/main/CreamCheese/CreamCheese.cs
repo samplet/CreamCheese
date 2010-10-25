@@ -135,6 +135,8 @@ namespace CreamCheese {
                             }
                         } else if(tree.Root.Token.Type == CP.TokenType.Range) {
                             throw new NotImplementedException("Range constraints are not implemented");
+                        } else if(tree.Root.Token.Type == CP.TokenType.Function) {
+                            AddConstraintsFromETree(network, kvp.Value, tree);
                         } else {
                             throw new InvalidOperationException("Invalid constraint list for cell with key \"" + kvp.Key + "\"");
                         }
@@ -146,98 +148,133 @@ namespace CreamCheese {
         }
 
         private void AddConstraintsFromETree(Cream.Network network, Cell cell, CP.ExpressionTree eTree) {
-            // TODO: This is buggy, use only one stack.
-            Stack<ICspItem> lhs = new Stack<ICspItem>();
-            Stack<ICspItem> rhs = new Stack<ICspItem>();
+            Stack<ICspItem> valueStack = new Stack<ICspItem>();
             foreach(CP.IToken token in eTree.Postfix) {
-                Stack<ICspItem> chs;
-                if(lhs.Count <= rhs.Count) {
-                    chs = lhs;
-                } else {
-                    chs = rhs;
-                }
                 switch(token.Type) {
                     case CP.TokenType.Operator:
-                        if(lhs.Peek().Type == CspItemType.Number && rhs.Peek().Type == CspItemType.Number) {
+                        if(((CP.OperatorToken) token).Unary) {
+                            ICspItem operand = valueStack.Pop();
                             switch(((CP.OperatorToken) token).Value) {
-                                case CP.OperatorToken.Operator.Plus:
-                                    chs.Push(new NumberCspItem(((NumberCspItem) lhs.Pop()).Value + ((NumberCspItem) rhs.Pop()).Value));
+                                case CP.OperatorToken.Operator.Negate:
+                                    if(operand.Type == CspItemType.Number) {
+                                        valueStack.Push(new NumberCspItem(-((NumberCspItem) operand).Value));
+                                    } else if(operand.Type == CspItemType.Variable) {
+                                        Cream.IntVariable negateResult = new Cream.IntVariable(network);
+                                        new Cream.IntFunc(network, Cream.IntFunc.Negate, negateResult, ((VariableCspItem) operand).Value);
+                                        valueStack.Push(new VariableCspItem(negateResult));
+                                    }
                                     break;
-                                case CP.OperatorToken.Operator.Minus:
-                                    chs.Push(new NumberCspItem(((NumberCspItem) lhs.Pop()).Value - ((NumberCspItem) rhs.Pop()).Value));
-                                    break;
-                                case CP.OperatorToken.Operator.Multiply:
-                                    chs.Push(new NumberCspItem(((NumberCspItem) lhs.Pop()).Value * ((NumberCspItem) rhs.Pop()).Value));
-                                    break;
+                                case CP.OperatorToken.Operator.Percent:
+                                    valueStack.Push(operand);
+                                    throw new NotImplementedException("The percent operator is not implemented");
                                 default:
-                                    throw new InvalidOperationException("The operator '" + token.ToString() + "' is not supported with numeric arguments");
+                                    valueStack.Push(operand);
+                                    throw new InvalidOperationException("Unknown unary operator");
                             }
                         } else {
-                            Cream.IntVariable v0, v1;
-                            if(lhs.Peek().Type == CspItemType.Number) {
-                                v0 = new Cream.IntVariable(network, ((NumberCspItem) lhs.Pop()).Value);
-                            } else if(lhs.Peek().Type == CspItemType.Variable) {
-                                v0 = ((VariableCspItem) lhs.Pop()).Value;
+                            ICspItem rhs = valueStack.Pop();
+                            ICspItem lhs = valueStack.Pop();
+                            if(lhs.Type == CspItemType.Number && rhs.Type == CspItemType.Number) {
+                                switch(((CP.OperatorToken) token).Value) {
+                                    case CP.OperatorToken.Operator.Plus:
+                                        valueStack.Push(new NumberCspItem(((NumberCspItem) lhs).Value + ((NumberCspItem) rhs).Value));
+                                        break;
+                                    case CP.OperatorToken.Operator.Minus:
+                                        valueStack.Push(new NumberCspItem(((NumberCspItem) lhs).Value - ((NumberCspItem) rhs).Value));
+                                        break;
+                                    case CP.OperatorToken.Operator.Multiply:
+                                        valueStack.Push(new NumberCspItem(((NumberCspItem) lhs).Value * ((NumberCspItem) rhs).Value));
+                                        break;
+                                    default:
+                                        throw new InvalidOperationException("The operator '" + token.ToString() + "' is not supported with numeric arguments");
+                                }
                             } else {
-                                throw new Exception("Cannot place a constraint on a constraint");
-                            }
-                            if(rhs.Peek().Type == CspItemType.Number) {
-                                v1 = new Cream.IntVariable(network, ((NumberCspItem) rhs.Pop()).Value);
-                            } else if(rhs.Peek().Type == CspItemType.Variable) {
-                                v1 = ((VariableCspItem) rhs.Pop()).Value;
-                            } else {
-                                throw new Exception("Cannot place a constraint on a constraint");
-                            }
-                            switch(((CP.OperatorToken) token).Value) {
-                                case CP.OperatorToken.Operator.EqualTo:
-                                    chs.Push(new ConstraintCspItem(new Cream.Equals(network, v0, v1)));
-                                    break;
-                                case CP.OperatorToken.Operator.NotEqualTo:
-                                    chs.Push(new ConstraintCspItem(new Cream.NotEquals(network, v0, v1)));
-                                    break;
-                                case CP.OperatorToken.Operator.GreaterThan:
-                                    chs.Push(new ConstraintCspItem(new Cream.IntComparison(network, Cream.IntComparison.Gt, v0, v1)));
-                                    break;
-                                case CP.OperatorToken.Operator.GreaterThanOrEqualTo:
-                                    chs.Push(new ConstraintCspItem(new Cream.IntComparison(network, Cream.IntComparison.Ge, v0, v1)));
-                                    break;
-                                case CP.OperatorToken.Operator.LessThan:
-                                    chs.Push(new ConstraintCspItem(new Cream.IntComparison(network, Cream.IntComparison.Lt, v0, v1)));
-                                    break;
-                                case CP.OperatorToken.Operator.LessThanOrEqualTo:
-                                    chs.Push(new ConstraintCspItem(new Cream.IntComparison(network, Cream.IntComparison.Le, v0, v1)));
-                                    break;
-                                case CP.OperatorToken.Operator.Plus:
-                                    Cream.IntVariable plusResult = new Cream.IntVariable(network);
-                                    new Cream.IntArith(network, Cream.IntArith.Add, plusResult, v0, v1);
-                                    chs.Push(new VariableCspItem(plusResult));
-                                    break;
-                                case CP.OperatorToken.Operator.Minus:
-                                    Cream.IntVariable minusResult = new Cream.IntVariable(network);
-                                    new Cream.IntArith(network, Cream.IntArith.Subtract, minusResult, v0, v1);
-                                    chs.Push(new VariableCspItem(minusResult));
-                                    break;
-                                case CP.OperatorToken.Operator.Multiply:
-                                    Cream.IntVariable multiplyResult = new Cream.IntVariable(network);
-                                    new Cream.IntArith(network, Cream.IntArith.MULTIPLY, multiplyResult, v0, v1);
-                                    chs.Push(new VariableCspItem(multiplyResult));
-                                    break;
-                                default:
-                                    throw new InvalidOperationException("The operator '" + token.ToString() + "' is not supported with variable arguments");
+                                Cream.IntVariable v0, v1;
+                                if(lhs.Type == CspItemType.Number) {
+                                    v0 = new Cream.IntVariable(network, ((NumberCspItem) lhs).Value);
+                                } else if(lhs.Type == CspItemType.Variable) {
+                                    v0 = ((VariableCspItem) lhs).Value;
+                                } else {
+                                    throw new Exception("Cannot place a constraint on a constraint");
+                                }
+                                if(rhs.Type == CspItemType.Number) {
+                                    v1 = new Cream.IntVariable(network, ((NumberCspItem) rhs).Value);
+                                } else if(rhs.Type == CspItemType.Variable) {
+                                    v1 = ((VariableCspItem) rhs).Value;
+                                } else {
+                                    throw new Exception("Cannot place a constraint on a constraint");
+                                }
+                                switch(((CP.OperatorToken) token).Value) {
+                                    case CP.OperatorToken.Operator.EqualTo:
+                                        valueStack.Push(new ConstraintCspItem(new Cream.Equals(network, v0, v1)));
+                                        break;
+                                    case CP.OperatorToken.Operator.NotEqualTo:
+                                        valueStack.Push(new ConstraintCspItem(new Cream.NotEquals(network, v0, v1)));
+                                        break;
+                                    case CP.OperatorToken.Operator.GreaterThan:
+                                        valueStack.Push(new ConstraintCspItem(new Cream.IntComparison(network, Cream.IntComparison.Gt, v0, v1)));
+                                        break;
+                                    case CP.OperatorToken.Operator.GreaterThanOrEqualTo:
+                                        valueStack.Push(new ConstraintCspItem(new Cream.IntComparison(network, Cream.IntComparison.Ge, v0, v1)));
+                                        break;
+                                    case CP.OperatorToken.Operator.LessThan:
+                                        valueStack.Push(new ConstraintCspItem(new Cream.IntComparison(network, Cream.IntComparison.Lt, v0, v1)));
+                                        break;
+                                    case CP.OperatorToken.Operator.LessThanOrEqualTo:
+                                        valueStack.Push(new ConstraintCspItem(new Cream.IntComparison(network, Cream.IntComparison.Le, v0, v1)));
+                                        break;
+                                    case CP.OperatorToken.Operator.Plus:
+                                        Cream.IntVariable plusResult = new Cream.IntVariable(network);
+                                        new Cream.IntArith(network, Cream.IntArith.Add, plusResult, v0, v1);
+                                        valueStack.Push(new VariableCspItem(plusResult));
+                                        break;
+                                    case CP.OperatorToken.Operator.Minus:
+                                        Cream.IntVariable minusResult = new Cream.IntVariable(network);
+                                        new Cream.IntArith(network, Cream.IntArith.Subtract, minusResult, v0, v1);
+                                        valueStack.Push(new VariableCspItem(minusResult));
+                                        break;
+                                    case CP.OperatorToken.Operator.Multiply:
+                                        Cream.IntVariable multiplyResult = new Cream.IntVariable(network);
+                                        new Cream.IntArith(network, Cream.IntArith.MULTIPLY, multiplyResult, v0, v1);
+                                        valueStack.Push(new VariableCspItem(multiplyResult));
+                                        break;
+                                    default:
+                                        throw new InvalidOperationException("The operator '" + token.ToString() + "' is not supported with variable arguments");
+                                }
                             }
                         }
                         break;
                     case CP.TokenType.Range:
                         string key = ConvertAddress(cell.Address, ((CP.RangeToken) token).Value);
                         if(_cells.ContainsKey(key)) {
-                            chs.Push(new VariableCspItem(_cells[key].Variable));
+                            valueStack.Push(new VariableCspItem(_cells[key].Variable));
                         } else {
                             System.Windows.Forms.MessageBox.Show("gCV(" + cell.Address + ", " + key + ") = " + GetCellValue(cell.Address, key).ToString());
-                            chs.Push(new NumberCspItem(int.Parse(GetCellValue(cell.Address, key).ToString())));
+                            valueStack.Push(new NumberCspItem(int.Parse(GetCellValue(cell.Address, key).ToString())));
                         }
                         break;
                     case CP.TokenType.Number:
-                            chs.Push(new NumberCspItem(((CP.NumberToken) token).Value));
+                            valueStack.Push(new NumberCspItem(((CP.NumberToken) token).Value));
+                        break;
+                    case CP.TokenType.Function:
+                        if(((CP.FunctionToken) token).Name == "NEQ") {
+                            List<Cream.IntVariable> nEqList = new List<Cream.IntVariable>();
+                            foreach(CP.ExpressionTree arg in ((CP.FunctionToken) token).Args) {
+                                if(arg.Root.Token.Type != CP.TokenType.Range) {
+                                    throw new InvalidOperationException("Only single cell ranges are supported for the NEQ function");
+                                } else {
+                                    key = ConvertAddress(cell.Address, ((CP.RangeToken) arg.Root.Token).Value);
+                                    if(_cells.ContainsKey(key)) {
+                                        nEqList.Add(_cells[key].Variable);
+                                    } else {
+                                        nEqList.Add(new Cream.IntVariable(network, int.Parse(GetCellValue(cell.Address, key).ToString())));
+                                    }
+                                }
+                            }
+                            valueStack.Push(new ConstraintCspItem(new Cream.NotEquals(network, nEqList.ToArray())));
+                        } else {
+                            throw new InvalidOperationException("Only the NEQ function is permitted");
+                        }
                         break;
                     default:
                         throw new InvalidOperationException("Only ranges, numbers, and operators are permitted");

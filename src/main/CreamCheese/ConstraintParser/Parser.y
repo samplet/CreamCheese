@@ -173,21 +173,20 @@ func    :   FIDENT LB RB
         |   FIDENT LB plist RB
 	        {
 				if($1.Root.Token.Type == TokenType.Unknown) {
-					FunctionToken ft = new FunctionToken(((UnknownToken) $1.Root.Token).Value, _tempParamList);
+					FunctionToken ft = new FunctionToken(((UnknownToken) $1.Root.Token).Value, _tempParamListStack.Pop());
 					$$ = new ExpressionTree(ft);
 				}
-				_tempParamList = null;
 	        }
         ;
 
 plist   :   param
             {
-				_tempParamList = new List<ExpressionTree>();
-				_tempParamList.Add($1);
+				_tempParamListStack.Push(new List<ExpressionTree>());
+				_tempParamListStack.Peek().Add($1);
 			}
 		|   plist SEP param
 			{
-				_tempParamList.Add($3);
+				_tempParamListStack.Peek().Add($3);
 			}
         ;
 
@@ -196,7 +195,7 @@ param   :   term
 
 %%
 
-  private List<ExpressionTree> _tempParamList = null;
+  private Stack<List<ExpressionTree>> _tempParamListStack = null;
   private bool _isParsed = false;
   private ExpressionTree _tree = null;
 
@@ -212,10 +211,12 @@ param   :   term
     }
   }
 
-  public Parser(): base(null) {}
+  public Parser(): base(null) {
+    _tempParamListStack = new Stack<List<ExpressionTree>>();
+  }
 
   public Parser(string str)
-  :base(null) {
+  :this() {
     Scanner scanner = new Scanner();
     scanner.SetSource(str, 0);
     this.Scanner = scanner;

@@ -12,9 +12,15 @@ namespace CreamCheese.ConstraintParser {
         }
 
         public ExpressionTree(IToken token, ExpressionTree left, ExpressionTree right) {
-            _root = new ExpressionTreeNode(token, left.Root, right.Root);
-            left.Root.Parent = _root;
-            right.Root.Parent = _root;
+            _root = new ExpressionTreeNode(token);
+            if(left != null) {
+                _root.Left = left.Root;
+                left.Root.Parent = _root;
+            }
+            if(right != null) {
+                _root.Right = right.Root;
+                right.Root.Parent = _root;
+            }
         }
 
         public ExpressionTree(IToken token) {
