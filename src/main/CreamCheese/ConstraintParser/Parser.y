@@ -152,7 +152,7 @@ expr    :   expr EQ expr
         |   MINUS expr %prec UMINUS
             {
 				OperatorToken ot = new OperatorToken(OperatorToken.Operator.Negate);
-				$$ = new ExpressionTree(ot, $1, null);
+				$$ = new ExpressionTree(ot, $2, null);
             }
         |   func
         |   range
