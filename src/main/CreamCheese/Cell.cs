@@ -3,50 +3,78 @@ using System.Collections.Generic;
 
 namespace CreamCheese {
 
-    class Cell {
+  /// <summary>
+  ///   A structure to contain necessary cell information.
+  /// </summary>
+  class Cell {
 
-        private string _address;
-        private string _formula;
-        private Cream.IntVariable _variable;
+    private string _address;
+    private string _formula;
+    private Cream.IntVariable _variable;
 
-        public string Address {
-            get {
-                return _address;
-            }
-            set {
-                _address = value;
-            }
-        }
-
-        public string Formula {
-            get {
-                return _formula;
-            }
-            set {
-                _formula = value;
-            }
-        }
-
-        public Cream.IntVariable Variable {
-            get {
-                return _variable;
-            }
-            set {
-                _variable = value;
-            }
-        }
-
-        public Cell(string address) {
-            _address = address;
-            _formula = "";
-            _variable = null;
-        }
-
-        public Cell(string address, string formula)
-            : this(address) {
-            _formula = formula;
-        }
-
+    /// <summary>
+    ///   The cell's CreamCheese address.
+    /// </summary>
+    /// <remarks>
+    ///   <para>
+    ///     Storing the cell's CreamCheese address prevents reverse lookup
+    ///     in the cell dictionary.
+    ///   </para>
+    /// </remarks>
+    public string Address {
+      get {
+	return _address;
+      }
+      set {
+	_address = value;
+      }
     }
+
+    /// <summary>
+    ///   The cell's formula.
+    /// </summary>
+    public string Formula {
+      get {
+	return _formula;
+      }
+      set {
+	_formula = value;
+      }
+    }
+
+    /// <summary>
+    ///   The cell as a CSP variable.
+    /// </summary>
+    public Cream.IntVariable Variable {
+      get {
+	return _variable;
+      }
+      set {
+	_variable = value;
+      }
+    }
+
+    /// <summary>
+    ///   Convenience constructor for Cell with an empty formula.
+    /// </summary>
+    /// <param name="address">The CreamCheese address to associate with the
+    ///   cell.</param>
+    public Cell(string address) {
+      _address = address;
+      _formula = "";
+      _variable = null;
+    }
+
+    /// <summary>
+    ///   Construct a Cell.
+    /// </summary>
+    /// <param name="address">The cell's CreamCheese address.</param>
+    /// <param name="formula">The cell's formula.</param>
+    public Cell(string address, string formula)
+    : this(address) {
+      _formula = formula;
+    }
+
+  }
 
 }
