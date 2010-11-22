@@ -1,0 +1,105 @@
+<?xml version="1.0"?>
+<project name="CreamCheese" default="build">
+
+  <property name="project.name" value="CreamCheese"/>
+  <property name="project.basename" value="creamcheese"/>
+  <property name="project.version" value="0"/>
+
+  <property name="lib.dir" value="lib"/>
+  <property name="src.dir" value="src/main"/>
+  <property name="test.dir" value="src/test"/>
+  <property name="build.dir" value="build"/>
+
+  <property name="archive" value="zip"/>
+  <property name="debug" value="true"/>
+
+  <target name="build" depends="build-creamcheese,build-excream"/>
+
+  <target name="build-creamcheese">
+    <mkdir dir="${build.dir}"/>
+    <exec program="gplex"
+	  output="${build.dir}/Scanner.cs">
+      <arg value="/out:-"/>
+      <arg value="${src.dir}/${project.name}/ConstraintParser/Scanner.lex"/>
+    </exec>
+    <exec program="gppg"
+	  output="${build.dir}/Parser.cs">
+      <arg value="/gplex"/>
+      <arg value="${src.dir}/${project.name}/ConstraintParser/Parser.y"/>
+    </exec>
+    <csc target="library"
+	 output="${build.dir}/${project.name}.dll"
+	 debug="${debug}">
+      <references>
+        <include name="${lib.dir}/HalfAndHalf.dll"/>
+      </references>
+      <sources>
+	<include name="${src.dir}/${project.name}/ConstraintParser/*.cs"/>
+	<include name="${src.dir}/${project.name}/*.cs"/>
+	<include name="${build.dir}/Scanner.cs"/>
+	<include name="${build.dir}/Parser.cs"/>
+      </sources>
+    </csc>
+  </target>
+
+  <target name="build-excream" depends="build-creamcheese">
+    <mkdir dir="${build.dir}"/>
+    <csc target="library"
+	 output="${build.dir}/Excream.dll"
+	 debug="${debug}">
+      <references>
+        <include name="${lib.dir}/HalfAndHalf.dll"/>
+        <include name="${lib.dir}/Extensibility.dll"/>
+        <include name="${lib.dir}/Microsoft.Office.Interop.Excel.dll"/>
+      </references>
+      <sources>
+	<include name="${src.dir}/${project.name}/ConstraintParser/*.cs"/>
+	<include name="${src.dir}/${project.name}/*.cs"/>
+	<include name="${build.dir}/Scanner.cs"/>
+	<include name="${build.dir}/Parser.cs"/>
+        <include name="${src.dir}/Excream/*.cs"/>
+      </sources>
+    </csc>
+  </target>
+
+  <target name="distcheck" depends="build">
+    <mkdir dir="${project.basename}-${project.version}"/>
+    <copy todir="${project.basename}-${project.version}">
+      <fileset basedir="${build.dir}">
+	<include name="*"/>
+      </fileset>
+    </copy>
+  </target>
+
+  <target name="dist" depends="distcheck">
+    <tar if="${archive == 'tar.gz'}"
+	 destfile="${project.basename}-${project.version}.tar.gz"
+	 compression="GZip">
+      <fileset basedir="${project.basename}-${project.version}"
+	       prefix="${project.basename}-${project.version}">
+	<include name="*"/>
+      </fileset>
+    </tar>
+    <tar if="${archive == 'tar.bz2'}"
+	 destfile="${project.basename}-${project.version}.tar.bz2"
+	 compression="BZip2">
+      <fileset basedir="${project.basename}-${project.version}"
+	       prefix="${project.basename}-${project.version}">
+	<include name="*"/>
+      </fileset>
+    </tar>
+    <zip if="${archive == 'zip'}"
+	 zipfile="${project.basename}-${project.version}.zip">
+      <fileset basedir="${project.basename}-${project.version}"
+	       prefix="${project.basename}-${project.version}">
+	<include name="*"/>
+      </fileset>
+    </zip>
+    <delete dir="${project.basename}-${project.version}"/>
+  </target>
+
+  <target name="clean">
+    <delete dir="${build.dir}"/>
+  </target>
+
+</project>
