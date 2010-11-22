@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Product Name="Excream" Id="9535550D-6FE0-4CEB-86CE-7F44482166F2"
+           UpgradeCode="6AED32C4-7BD1-4BF5-A7D5-07DFACC5B199" Language="4105"
+           Codepage="1252" Version="0.0.0" Manufacturer="Timothy Sample">
+
+    <Package Id="*" Keywords="Installer"
+             Description="CSP solving add-in for Microsoft Excel"
+             Languages="4105" SummaryCodepage="1252" Compressed="yes"
+             Manufacturer="Timothy Sample"/>
+
+    <Property Id="ALLUSERS" Secure="yes"/>
+
+    <Media Id="1" Cabinet="Excream.cab" EmbedCab="yes"/>
+
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="AppDataFolder" Name="AppData">
+        <Directory Id="Microsoft" Name="Microsoft">
+          <Directory Id="AddIns" Name="AddIns">
+            <Directory Id="INSTALLDIR" Name="Excream"/>
+          </Directory>
+        </Directory>
+      </Directory>
+    </Directory>
+
+    <Component Id="ExcreamComponent" Directory="INSTALLDIR"
+               Guid="2362B309-E9BC-4196-BA8A-CD9DC971070E">
+      <CreateFolder/>
+      <RemoveFolder Id="RemoveExcreamFolder" On="uninstall"/>
+      <RemoveFolder Id="RemoveAddinsFolder" Directory="AddIns" On="uninstall"/>
+      <RemoveFolder Id="RemoveMicrosoftFolder" Directory="Microsoft"
+                    On="uninstall"/>
+      <File Id="ExcreamFile" Name="Excream.dll" Source="Excream.dll">
+        <Class Id="F4389BD9-A9C7-496f-926A-BD8730A43A8A"
+               Context="InprocServer32" Description="Excream"
+               ThreadingModel="apartment">
+          <ProgId Id="Excream.Functions"
+                  Description="Constraint solving functions for Excel"/>
+        </Class>
+      </File>
+      <File Id="HalfAndHalfFile" Name="HalfAndHalf.dll"
+            Source="HalfAndHalf.dll"/>
+      <RegistryKey Root="HKCU"
+                   Key="Software\Microsoft\Office\Excel\Addins\Excream.Functions"
+                   Action="createAndRemoveOnUninstall">
+        <RegistryValue Type="string" Name="FriendlyName"
+                       Value="Excream Constraint Solver" KeyPath="yes"/>
+        <RegistryValue Type="integer" Name="LoadBehavior" Value="2"/>
+      </RegistryKey>
+    </Component>
+
+    <Feature Id="Complete" Level="1">
+      <ComponentRef Id="ExcreamComponent"/>
+    </Feature>
+
+  </Product>
+</Wix>
