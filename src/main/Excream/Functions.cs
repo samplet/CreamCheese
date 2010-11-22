@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Runtime.InteropServices;
 using Microsoft.Win32;
 using Extensibility;
@@ -25,7 +25,7 @@ namespace Excream {
 
             Excel.Range range = (Excel.Range) caller;
             string address = range.get_Address((object) false, (object) false, Excel.XlReferenceStyle.xlA1, (object) false, Type.Missing);
-            string key = Globals.Workbooks[range.Worksheet.Parent] + "." + Globals.Worksheets[range.Parent] + "." + address;
+            string key = Globals.Workbooks[(Excel.Workbook) range.Worksheet.Parent] + "." + Globals.Worksheets[(Excel.Worksheet) range.Parent] + "." + address;
 
             /* 
              * Since we cannot have circular references, we must build our own formula
@@ -73,37 +73,6 @@ namespace Excream {
         }
 
         public void OnStartupComplete(ref Array custom) {
-        }
-
-        #endregion
-
-        #region COM Register Code
-
-        /*
-         * Here we register the class for Excel to discover. See
-         * [ http://blogs.msdn.com/b/eric_carter/archive/2004/12/01/273127.aspx ] for
-         * details.
-         */
-
-        [ComRegisterFunctionAttribute]
-        public static void RegisterFunction(Type type) {
-            Registry.ClassesRoot.CreateSubKey(GetSubKeyName(type, "Programmable"));
-            RegistryKey key = Registry.ClassesRoot.OpenSubKey(GetSubKeyName(type, "InprocServer32"), true);
-            key.SetValue("", System.Environment.SystemDirectory + @"\mscoree.dll", RegistryValueKind.String);
-        }
-
-        [ComUnregisterFunctionAttribute]
-        public static void UnregisterFunction(Type type) {
-            Registry.ClassesRoot.DeleteSubKey(GetSubKeyName(type, "Programmable"), false);
-        }
-
-        private static string GetSubKeyName(Type type, string subKeyName) {
-            System.Text.StringBuilder s = new System.Text.StringBuilder();
-            s.Append(@"CLSID\{");
-            s.Append(type.GUID.ToString().ToUpper());
-            s.Append(@"}\");
-            s.Append(subKeyName);
-            return s.ToString();
         }
 
         #endregion

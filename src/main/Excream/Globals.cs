@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Excel = Microsoft.Office.Interop.Excel;
 using CC = CreamCheese;
@@ -24,7 +24,8 @@ namespace Excream {
         public static CC.CreamCheese ConstraintSolver {
             get {
                 if(_constraintSolver == null) {
-                    _constraintSolver = new CC.CreamCheese(Globals.ConvertAddress, Globals.GetCellValue);
+                    CC.SpreadSheet ss = new CC.SpreadSheet(Globals.ConvertAddress, Globals.GetCellValue);
+                    _constraintSolver = new CC.CreamCheese(ss);
                 }
                 return _constraintSolver;
             }
@@ -77,7 +78,7 @@ namespace Excream {
                 if(worksheet.StartsWith("'")) {
                     worksheet = worksheet.Substring(1, worksheet.Length - 2);
                 }
-                worksheet = Globals.Worksheets[Globals.Workbooks[workbookId].Worksheets[worksheet]].ToString();
+                worksheet = Globals.Worksheets[(Excel.Worksheet) Globals.Workbooks[workbookId].Worksheets[worksheet]].ToString();
                 refAddress = refAddress.Substring(end + 1);
             } else {
                 int beginning = baseAddress.IndexOf('.');
@@ -95,7 +96,7 @@ namespace Excream {
             worksheet = refAddress.Substring(beginning + 1, end - beginning - 1);
             worksheetId = int.Parse(worksheet);
             refAddress = refAddress.Substring(end + 1);
-            return (object) Globals.Worksheets[worksheetId].get_Range(refAddress).Value;
+            return (object) Globals.Worksheets[worksheetId].get_Range(refAddress, Type.Missing).get_Value(Type.Missing);
         }
 
     }
