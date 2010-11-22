@@ -28,8 +28,9 @@
       <arg value="${src.dir}/${project.name}/ConstraintParser/Parser.y"/>
     </exec>
     <csc target="library"
-	 output="${build.dir}/${project.name}.dll"
-	 debug="${debug}">
+	 output="${build.dir}/${project.name}.dll
+	 debug="${debug}"
+         doc="${build.dir}/CreamCheese.xml">
       <references>
         <include name="${lib.dir}/HalfAndHalf.dll"/>
       </references>

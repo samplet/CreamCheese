@@ -9,6 +9,9 @@ namespace CreamCheese {
   /// </summary>
   public class CreamCheese {
 
+    /// <summary>
+    ///   Remember the given spreadsheet functionality.
+    /// </summary>
     private SpreadSheet _spreadSheet;
 
     /// <summary>
@@ -24,10 +27,8 @@ namespace CreamCheese {
     /// <summary>
     ///   Constructs and initializes a CreamCheese instance.
     /// </summary>
-    /// <param name="cAD">A function that will normalize spreadsheet
-    ///   addresses to a form that CreamCheese can work with.</param>
-    /// <param name="gCV">A function that will return a cell's value given
-    ///   its address.</param>
+    /// <param name="spreadSheet">An instance of
+    ///   <see cref="SpreadSheet"/>.</param>
     public
     CreamCheese(SpreadSheet spreadSheet) {
       _spreadSheet = spreadSheet;
@@ -109,7 +110,7 @@ namespace CreamCheese {
     ///   Remove a set of cells from the list of constrained cells based on
     ///   a partial CreamCheese address.
     /// </summary>
-    /// <param name="bookKey">The partial address that represents the
+    /// <param name="sheetKey">The partial address that represents the
     ///   worksheet the cell is from.</param>
     public void
     RemoveSheet(string sheetKey) {
