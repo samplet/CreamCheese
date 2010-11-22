@@ -32,6 +32,9 @@ notspace [^ \t\n\v\f\r]
 "%"  { return (int) Tokens.PERCENT; }
 "^"  { return (int) Tokens.EXP; }
 
+/* String Operators */
+"&"  { return (int) Tokens.CONCAT; }
+
 /* Range Operators */
 ":"  { return (int) Tokens.RANGE; }
 // Omitting the intersection operator: (" ", "!").
@@ -39,32 +42,47 @@ notspace [^ \t\n\v\f\r]
 
 /* String Literal */
 \"(\"\"|[^\"])*\" {
-  yylval = new ExpressionTree(new StringToken(yytext));
+  string s = yytext;
+  int i = s.IndexOf('"');
+  while(i != -1) {
+    s = s.Remove(i, 1);
+    if(i + 1 < s.Length) {
+      i = s.IndexOf('"', i + 1);
+    } else {
+      break;
+    }
+  }
+  yylval = new StringToken(s);
   return (int) Tokens.STRING;
 }
 
 /* Numeric Literal */
 {digit}*"."?{digit}+ {
-  int number = int.Parse(yytext);
-  yylval = new ExpressionTree(new NumberToken(number));
+  try {
+    double number = double.Parse(yytext);
+    yylval = new NumberToken(number);
+  } catch(Exception) {
+    yylval = new StringToken(yytext);
+    return (int) Tokens.error;
+  }
   return (int) Tokens.NUMBER;
 }
 
 /* Function Indentifier */
 "_"+[a-zA-Z0-9][a-zA-Z0-9_]*|[a-zA-Z][a-zA-Z0-9_]* {
-  yylval = new ExpressionTree(new UnknownToken(yytext));
+  yylval = new IdToken(yytext);
   return (int) Tokens.FIDENT;
 }
 
 /* Range Reference */
 (((\'(\'\'|[^\'])*\')|[^ \t\n\v\f\r\'!]+)!)?("$"?[a-zA-Z]+)("$"?[0-9]+)? {
-  yylval = new ExpressionTree(new RangeToken(yytext));
+  yylval = new RangeToken(yytext);
   return (int) Tokens.RREF;
 }
 
 /* Range Name */
 [\\_a-zA-Z][a-zA-Z0-9.\\_]* {
-  yylval = new ExpressionTree(new RangeToken(yytext));
+  yylval = new RangeToken(yytext);
   return (int) Tokens.RNAME;
 }
 

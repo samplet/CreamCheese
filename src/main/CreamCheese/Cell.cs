@@ -6,7 +6,7 @@ namespace CreamCheese {
   /// <summary>
   ///   A structure to contain necessary cell information.
   /// </summary>
-  class Cell {
+  internal class Cell {
 
     private string _address;
     private string _formula;

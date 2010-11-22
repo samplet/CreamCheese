@@ -1,12 +1,13 @@
 namespace CreamCheese.ConstraintParser {
 
-  public enum TokenType {
-    Operator,
+  internal enum TokenType {
+    Boolean,
+    Constraint,
+    Id,
     Number,
-    Function,
     Range,
     String,
-    Unknown
+    Variable
   }
 
 }

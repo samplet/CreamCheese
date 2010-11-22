@@ -1,14 +1,14 @@
 namespace CreamCheese.ConstraintParser {
 
-  public class UnknownToken: IToken {
+  internal class BooleanToken: IToken {
 
-    private string _value;
+    private bool _value;
 
-    public UnknownToken(string value) {
+    public BooleanToken(bool value) {
       _value = value;
     }
 
-    public string Value {
+    public bool Value {
       get {
 	return _value;
       }
@@ -16,12 +16,12 @@ namespace CreamCheese.ConstraintParser {
 
     TokenType IToken.Type {
       get {
-	return TokenType.Unknown;
+	return TokenType.Boolean;
       }
     }
 
     public override string ToString() {
-      return Value;
+      return Value.ToString().ToUpper();
     }
 
   }

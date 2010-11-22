@@ -1,14 +1,14 @@
 namespace CreamCheese.ConstraintParser {
 
-  internal class NumberToken: IToken {
+  internal class IdToken: IToken {
 
-    private double _value;
+    private string _value;
 
-    public NumberToken(double value) {
+    public IdToken(string value) {
       _value = value;
     }
 
-    public double Value {
+    public string Value {
       get {
 	return _value;
       }
@@ -16,12 +16,12 @@ namespace CreamCheese.ConstraintParser {
 
     TokenType IToken.Type {
       get {
-	return TokenType.Number;
+	return TokenType.Id;
       }
     }
 
     public override string ToString() {
-      return Value.ToString();
+      return Value;
     }
 
   }

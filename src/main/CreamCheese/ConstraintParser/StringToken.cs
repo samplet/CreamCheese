@@ -1,6 +1,6 @@
 namespace CreamCheese.ConstraintParser {
 
-  public class StringToken: IToken {
+  internal class StringToken: IToken {
 
     private string _value;
 

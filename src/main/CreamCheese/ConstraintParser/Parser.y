@@ -2,13 +2,13 @@
 
 %visibility internal
 
-%YYSTYPE ExpressionTree
+%YYSTYPE IToken
 
 %token NUMBER FIDENT RNAME RREF SPACE STRING
 %token LB RB SEP
 
 %left EQ GT LT GEQ LEQ NEQ
-%left PLUS MINUS
+%left PLUS MINUS CONCAT
 %left MULT DIV
 %left PERCENT
 %left EXP
@@ -19,15 +19,14 @@
 
 %%
 
-list    :   term
+clist   :   expr
             {
-				_tree = $1;
-				_isParsed = true;
-			}
-        ;
-
-term    :   expr
-        |   STRING
+              Semantics.Constraint($1);
+            }
+        |   clist SEP expr
+            {
+              Semantics.Constraint($3);
+            }
         ;
 
 /**************************
@@ -37,28 +36,28 @@ term    :   expr
 range   :   range1
         |   range intcOp range1
             {
-				OperatorToken ot = new OperatorToken(OperatorToken.Operator.Intersect);
-				$$ = new ExpressionTree(ot, $1, $3);
-			}
+              string r1 = ((RangeToken) $1).Value;
+              string r2 = ((RangeToken) $3).Value;
+              $$ = new RangeToken(r1 + " " + r2);
+            }
         ;
 
 range1  :   range2
         |   range1 rangeOp range2
             {
-				OperatorToken ot = new OperatorToken(OperatorToken.Operator.Range);
-				$$ = new ExpressionTree(ot, $1, $3);
-	        }
-		|   NUMBER rangeOp NUMBER
-		    {
-				OperatorToken ot = new OperatorToken(OperatorToken.Operator.Range);
-				RangeToken rt1 = new RangeToken(((NumberToken) $1.Root.Token).Value.ToString());
-				$1.Root.Token = rt1;
-				RangeToken rt2 = new RangeToken(((NumberToken) $3.Root.Token).Value.ToString());
-				$3.Root.Token = rt2;
-				$$ = new ExpressionTree(ot, $1, $3);
-		    }
+              string r1 = ((RangeToken) $1).Value;
+              string r2 = ((RangeToken) $3).Value;
+              $$ = new RangeToken(r1 + ":" + r2);
+            }
+        |   NUMBER rangeOp NUMBER
+            {
+              string r1 = ((NumberToken) $1).Value.ToString();
+              string r2 = ((NumberToken) $3).Value.ToString();
+              $$ = new RangeToken(r1 + ":" + r2);
+            }
         ;
 
+/* There is no support for parenthesis in range operations in Excel. */
 range2  :   rRef
       //|   LB range RB
         ;
@@ -67,11 +66,8 @@ rRef    :   RREF
         |   RNAME
         |   FIDENT
             {
-		        if($1.Root.Token.Type == TokenType.Unknown) {
-					RangeToken rt = new RangeToken(((UnknownToken) $1.Root.Token).Value);
-					$$ = new ExpressionTree(rt);
-				}
-	        }
+              $$ = new RangeToken(((IdToken) $1).Value);
+            }
         ;
 
 rangeOp :   RANGE
@@ -81,6 +77,7 @@ intcOp  :   /* empty */
         ;
 
 /* There is no union operator, despite what Micrsoft says
+   (it is just conceptual)
 unionOp :   SEP
         ;
 */
@@ -89,74 +86,70 @@ unionOp :   SEP
  * Expression Definition  *
  **************************/
 
-expr    :   expr EQ expr
+expr    :   LB expr RB
             {
-				OperatorToken ot = new OperatorToken(OperatorToken.Operator.EqualTo);
-				$$ = new ExpressionTree(ot, $1, $3);
+              $$ = $2;
+            }
+        |   expr EQ expr
+            {
+              $$ = Semantics.InterpretExpression($1, $3, Tokens.EQ);
             }
         |   expr GT expr
             {
-				OperatorToken ot = new OperatorToken(OperatorToken.Operator.GreaterThan);
-				$$ = new ExpressionTree(ot, $1, $3);
+              $$ = Semantics.InterpretExpression($1, $3, Tokens.GT);
             }
         |   expr LT expr
             {
-				OperatorToken ot = new OperatorToken(OperatorToken.Operator.LessThan);
-				$$ = new ExpressionTree(ot, $1, $3);
+              $$ = Semantics.InterpretExpression($1, $3, Tokens.LT);
             }
         |   expr GEQ expr
             {
-				OperatorToken ot = new OperatorToken(OperatorToken.Operator.GreaterThanOrEqualTo);
-				$$ = new ExpressionTree(ot, $1, $3);
+              $$ = Semantics.InterpretExpression($1, $3, Tokens.GEQ);
             }
         |   expr LEQ expr
             {
-				OperatorToken ot = new OperatorToken(OperatorToken.Operator.LessThanOrEqualTo);
-				$$ = new ExpressionTree(ot, $1, $3);
+              $$ = Semantics.InterpretExpression($1, $3, Tokens.LEQ);
             }
         |   expr NEQ expr
             {
-				OperatorToken ot = new OperatorToken(OperatorToken.Operator.NotEqualTo);
-				$$ = new ExpressionTree(ot, $1, $3);
+              $$ = Semantics.InterpretExpression($1, $3, Tokens.LEQ);
             }
         |   expr PLUS expr
             {
-				OperatorToken ot = new OperatorToken(OperatorToken.Operator.Plus);
-				$$ = new ExpressionTree(ot, $1, $3);
+              $$ = Semantics.InterpretExpression($1, $3, Tokens.PLUS);
             }
         |   expr MINUS expr
             {
-				OperatorToken ot = new OperatorToken(OperatorToken.Operator.Minus);
-				$$ = new ExpressionTree(ot, $1, $3);
+              $$ = Semantics.InterpretExpression($1, $3, Tokens.MINUS);
             }
         |   expr MULT expr
             {
-				OperatorToken ot = new OperatorToken(OperatorToken.Operator.Multiply);
-				$$ = new ExpressionTree(ot, $1, $3);
+              $$ = Semantics.InterpretExpression($1, $3, Tokens.MULT);
             }
         |   expr DIV expr
             {
-				OperatorToken ot = new OperatorToken(OperatorToken.Operator.Divide);
-				$$ = new ExpressionTree(ot, $1, $3);
+              $$ = Semantics.InterpretExpression($1, $3, Tokens.DIV);
             }
         |   expr PERCENT
             {
-				OperatorToken ot = new OperatorToken(OperatorToken.Operator.Percent);
-				$$ = new ExpressionTree(ot, $1, null);
+              $$ = Semantics.InterpretExpression($1, Tokens.PERCENT);
             }
         |   expr EXP expr
             {
-				OperatorToken ot = new OperatorToken(OperatorToken.Operator.Exponentiate);
-				$$ = new ExpressionTree(ot, $1, $3);
+              $$ = Semantics.InterpretExpression($1, $3, Tokens.EXP);
             }
         |   MINUS expr %prec UMINUS
             {
-				OperatorToken ot = new OperatorToken(OperatorToken.Operator.Negate);
-				$$ = new ExpressionTree(ot, $2, null);
+              $$ = Semantics.InterpretExpression($2, Tokens.UMINUS);
+            }
+        |   expr CONCAT expr
+            {
+              $$ = Semantics.InterpretExpression($1, $3, Tokens.CONCAT);
             }
         |   func
         |   range
         |   NUMBER
+        |   STRING
         ;
 
 /**************************
@@ -165,58 +158,43 @@ expr    :   expr EQ expr
 
 func    :   FIDENT LB RB
             {
-				if($1.Root.Token.Type == TokenType.Unknown) {
-					FunctionToken ft = new FunctionToken(((UnknownToken) $1.Root.Token).Value);
-					$$ = new ExpressionTree(ft);
-				}
-	        }
+              string functionName = ((IdToken) $1).Value;
+              IToken[] args = {};
+              $$ = Semantics.Function(functionName, args);
+            }
         |   FIDENT LB plist RB
-	        {
-				if($1.Root.Token.Type == TokenType.Unknown) {
-					FunctionToken ft = new FunctionToken(((UnknownToken) $1.Root.Token).Value, _tempParamListStack.Pop());
-					$$ = new ExpressionTree(ft);
-				}
-	        }
+            {
+              string functionName = ((IdToken) $1).Value;
+              IToken[] args = _tempParamListStack.Pop().ToArray();
+              $$ = Semantics.Function(functionName, args);
+            }
         ;
 
 plist   :   param
             {
-				_tempParamListStack.Push(new List<ExpressionTree>());
-				_tempParamListStack.Peek().Add($1);
-			}
-		|   plist SEP param
-			{
-				_tempParamListStack.Peek().Add($3);
-			}
+              _tempParamListStack.Push(new List<IToken>());
+              _tempParamListStack.Peek().Add($1);
+            }
+        |   plist SEP param
+            {
+              _tempParamListStack.Peek().Add($3);
+            }
         ;
 
-param   :   term
+param   :   expr
         ;
 
 %%
 
-  private Stack<List<ExpressionTree>> _tempParamListStack = null;
-  private bool _isParsed = false;
-  private ExpressionTree _tree = null;
+  private Stack<List<IToken>> _tempParamListStack = null;
 
-  public bool IsParsed {
-    get {
-      return _isParsed;
-    }
+  public
+  Parser(): base(null) {
+    _tempParamListStack = new Stack<List<IToken>>();
   }
 
-  public ExpressionTree Tree {
-    get {
-      return _tree;
-    }
-  }
-
-  public Parser(): base(null) {
-    _tempParamListStack = new Stack<List<ExpressionTree>>();
-  }
-
-  public Parser(string str)
-  :this() {
+  public
+  Parser(string str): this() {
     Scanner scanner = new Scanner();
     scanner.SetSource(str, 0);
     this.Scanner = scanner;

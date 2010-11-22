@@ -1,6 +1,6 @@
 namespace CreamCheese.ConstraintParser {
 
-  public interface IToken {
+  internal interface IToken {
 
     TokenType Type {
       get;

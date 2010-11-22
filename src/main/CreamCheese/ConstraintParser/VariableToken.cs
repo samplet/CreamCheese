@@ -1,14 +1,16 @@
+using Cream;
+
 namespace CreamCheese.ConstraintParser {
 
-  internal class NumberToken: IToken {
+  internal class VariableToken: IToken {
 
-    private double _value;
+    private Variable _value;
 
-    public NumberToken(double value) {
+    public VariableToken(Variable value) {
       _value = value;
     }
 
-    public double Value {
+    public Variable Value {
       get {
 	return _value;
       }
@@ -16,7 +18,7 @@ namespace CreamCheese.ConstraintParser {
 
     TokenType IToken.Type {
       get {
-	return TokenType.Number;
+	return TokenType.Variable;
       }
     }
 
