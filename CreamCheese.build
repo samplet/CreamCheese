@@ -1,6 +1,11 @@
 <?xml version="1.0"?>
 <project name="CreamCheese" default="build">
 
+  <property if="${not property::exists('archive')}"
+            name="archive" value="zip"/>
+  <property if="${not property::exists('debug')}"
+            name="debug" value="false"/>
+
   <property name="project.name" value="CreamCheese"/>
   <property name="project.basename" value="creamcheese"/>
   <property name="project.version" value="0"/>
@@ -9,9 +14,6 @@
   <property name="src.dir" value="src/main"/>
   <property name="test.dir" value="src/test"/>
   <property name="build.dir" value="build"/>
-
-  <property name="archive" value="zip"/>
-  <property name="debug" value="true"/>
 
   <target name="build" depends="build-creamcheese,build-excream"/>
 
@@ -28,7 +30,7 @@
       <arg value="${src.dir}/${project.name}/ConstraintParser/Parser.y"/>
     </exec>
     <csc target="library"
-	 output="${build.dir}/${project.name}.dll
+	 output="${build.dir}/${project.name}.dll"
 	 debug="${debug}"
          doc="${build.dir}/CreamCheese.xml">
       <references>
