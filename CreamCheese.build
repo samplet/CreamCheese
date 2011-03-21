@@ -15,32 +15,47 @@
   <property name="test.dir" value="src/test"/>
   <property name="build.dir" value="build"/>
 
-  <target name="build" depends="build-creamcheese,build-excream"/>
+  <target name="build" depends="build-formulaparser,build-creamcheese,
+                                build-excream,build-spreadsim"/>
 
-  <target name="build-creamcheese">
+  <target name="build-formulaparser">
     <mkdir dir="${build.dir}"/>
     <exec program="gplex"
 	  output="${build.dir}/Scanner.cs">
       <arg value="/out:-"/>
-      <arg value="${src.dir}/${project.name}/ConstraintParser/Scanner.lex"/>
+      <arg value="${src.dir}/FormulaParser/Scanner.lex"/>
     </exec>
     <exec program="gppg"
 	  output="${build.dir}/Parser.cs">
       <arg value="/gplex"/>
-      <arg value="${src.dir}/${project.name}/ConstraintParser/Parser.y"/>
+      <arg value="${src.dir}/FormulaParser/Parser.y"/>
     </exec>
     <csc target="library"
+	 output="${build.dir}/FormulaParser.dll"
+	 debug="${debug}">
+      <references>
+        <include name="${lib.dir}/QUT.ShiftReduceParser.dll"/>
+      </references>
+      <sources>
+	<include name="${src.dir}/FormulaParser/*.cs"/>
+	<include name="${build.dir}/Scanner.cs"/>
+	<include name="${build.dir}/Parser.cs"/>
+      </sources>
+    </csc>
+  </target>
+
+  <target name="build-creamcheese" depends="build-formulaparser">
+    <mkdir dir="${build.dir}"/>
+    <csc target="library"
 	 output="${build.dir}/${project.name}.dll"
-	 debug="${debug}"
-         doc="${build.dir}/CreamCheese.xml">
+	 debug="${debug}">
       <references>
         <include name="${lib.dir}/HalfAndHalf.dll"/>
+        <include name="${build.dir}/FormulaParser.dll"/>
       </references>
       <sources>
 	<include name="${src.dir}/${project.name}/ConstraintParser/*.cs"/>
 	<include name="${src.dir}/${project.name}/*.cs"/>
-	<include name="${build.dir}/Scanner.cs"/>
-	<include name="${build.dir}/Parser.cs"/>
       </sources>
     </csc>
   </target>
@@ -54,13 +69,38 @@
         <include name="${lib.dir}/HalfAndHalf.dll"/>
         <include name="${lib.dir}/Extensibility.dll"/>
         <include name="${lib.dir}/Microsoft.Office.Interop.Excel.dll"/>
+        <include name="${build.dir}/CreamCheese.dll"/>
       </references>
       <sources>
-	<include name="${src.dir}/${project.name}/ConstraintParser/*.cs"/>
-	<include name="${src.dir}/${project.name}/*.cs"/>
-	<include name="${build.dir}/Scanner.cs"/>
-	<include name="${build.dir}/Parser.cs"/>
         <include name="${src.dir}/Excream/*.cs"/>
+      </sources>
+    </csc>
+  </target>
+
+  <target name="build-spreadsim" depends="build-creamcheese">
+    <mkdir dir="${build.dir}"/>
+    <exec program="gplex"
+	  output="${build.dir}/CommandScanner.cs">
+      <arg value="/out:-"/>
+      <arg value="${test.dir}/SpreadSim/CommandScanner.lex"/>
+    </exec>
+    <exec program="gppg"
+	  output="${build.dir}/CommandParser.cs">
+      <arg value="/gplex"/>
+      <arg value="${test.dir}/SpreadSim/CommandParser.y"/>
+    </exec>
+    <csc target="exe"
+	 output="${build.dir}/SpreadSim.exe"
+	 debug="${debug}">
+      <references>
+        <include name="${lib.dir}/QUT.ShiftReduceParser.dll"/>
+        <include name="${build.dir}/FormulaParser.dll"/>
+        <include name="${build.dir}/CreamCheese.dll"/>
+      </references>
+      <sources>
+	<include name="${test.dir}/SpreadSim/*.cs"/>
+	<include name="${build.dir}/CommandScanner.cs"/>
+	<include name="${build.dir}/CommandParser.cs"/>
       </sources>
     </csc>
   </target>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using FP = FormulaParser;
 using CP = CreamCheese.ConstraintParser;
 
 namespace CreamCheese {
@@ -159,9 +160,10 @@ namespace CreamCheese {
 	kvp.Value.Variable = new Cream.IntVariable(network, kvp.Key);
       }
       foreach(KeyValuePair<string, Cell> kvp in _cells) {
-        CP.ConstraintParser cp =
-          new CP.ConstraintParser(_spreadSheet, kvp.Value, _cells, network);
-        cp.Parse();
+        CP.Semantics semantics =
+          new CP.Semantics(kvp.Value, _cells, network, _spreadSheet);
+        FP.Parser fp = new FP.Parser(semantics);
+        fp.Parse();
       }
       Cream.Solver solver = new Cream.DefaultSolver(network);
       _lastSolution = solver.FindFirst();

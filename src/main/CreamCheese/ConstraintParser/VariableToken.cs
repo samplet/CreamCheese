@@ -1,8 +1,9 @@
 using Cream;
+using FormulaParser;
 
 namespace CreamCheese.ConstraintParser {
 
-  internal class VariableToken: IToken {
+  public class VariableToken: IToken {
 
     private Variable _value;
 
@@ -13,12 +14,6 @@ namespace CreamCheese.ConstraintParser {
     public Variable Value {
       get {
 	return _value;
-      }
-    }
-
-    TokenType IToken.Type {
-      get {
-	return TokenType.Variable;
       }
     }
 
