@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -64,12 +64,12 @@
   </Target>
   -->
   <Target Name="GenerateParsers" Inputs="@(GenerateParser)" Outputs="@(GenerateParser->'%(Filename).cs')">
-    <Exec Command="gppg.exe /gplex @(GenerateParser) &gt; ..\..\..\build\%(GenerateParser.Filename).cs" />
-    <Touch Files="..\..\..\build\%(GenerateParser.Filename).cs" />
+    <Exec Command="gppg.exe /gplex @(GenerateParser) &gt; %(GenerateParser.Filename).cs" />
+    <Touch Files="%(GenerateParser.Filename).cs" />
   </Target>
   <Target Name="GenerateScanners" Inputs="@(GenerateScanner)" Outputs="@(GenerateScanner->'%(Filename).cs')">
-    <Exec Command="gplex.exe /out:..\..\..\build\%(GenerateScanner.Filename).cs @(GenerateScanner)" />
-    <Touch Files="..\..\..\build\%(GenerateScanner.Filename).cs" />
+    <Exec Command="gplex.exe /out:%(GenerateScanner.Filename).cs @(GenerateScanner)" />
+    <Touch Files="%(GenerateScanner.Filename).cs" />
   </Target>
   <ItemGroup>
     <Compile Include="BooleanToken.cs" />
@@ -83,11 +83,11 @@
     <Compile Include="SemanticsBase.cs" />
     <Compile Include="StringToken.cs" />
     <GenerateParser Include="Parser.y" />
-    <Compile Include="..\..\..\build\Parser.cs">
+    <Compile Include="Parser.cs">
       <DependentUpon>Parser.y</DependentUpon>
     </Compile>
     <GenerateScanner Include="Scanner.lex" />
-    <Compile Include="..\..\..\build\Scanner.cs">
+    <Compile Include="Scanner.cs">
       <DependentUpon>Scanner.lex</DependentUpon>
     </Compile>
   </ItemGroup>
