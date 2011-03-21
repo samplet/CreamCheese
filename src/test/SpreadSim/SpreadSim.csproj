@@ -5,20 +5,20 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{079E4D08-2696-4B4C-93CF-225C732088B7}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <ProjectGuid>{E40EA178-5F7C-4A74-9297-4F9A6BCDBAE4}</ProjectGuid>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Excream</RootNamespace>
-    <AssemblyName>Excream</AssemblyName>
+    <RootNamespace>SpreadSim</RootNamespace>
+    <AssemblyName>SpreadSim</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
     <OldToolsVersion>3.5</OldToolsVersion>
     <TargetFrameworkProfile />
-    <IsWebBootstrapper>false</IsWebBootstrapper>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -31,6 +31,7 @@
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
@@ -42,7 +43,6 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <RegisterForComInterop>true</RegisterForComInterop>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -52,6 +52,12 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
@@ -60,29 +66,32 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <Target Name="GenerateParsers" Inputs="@(GenerateParser)" Outputs="@(GenerateParser->'%(Filename).cs')">
+    <Exec Command="gppg.exe /gplex @(GenerateParser) &gt; ..\..\..\build\%(GenerateParser.Filename).cs" />
+    <Touch Files="..\..\..\build\%(GenerateParser.Filename).cs" />
+  </Target>
+  <Target Name="GenerateScanners" Inputs="@(GenerateScanner)" Outputs="@(GenerateScanner->'%(Filename).cs')">
+    <Exec Command="gplex.exe /out:..\..\..\build\%(GenerateScanner.Filename).cs @(GenerateScanner)" />
+    <Touch Files="..\..\..\build\%(GenerateScanner.Filename).cs" />
+  </Target>
   <ItemGroup>
-    <Compile Include="ChangeWatcher.cs" />
-    <Compile Include="DeleteBookWatcher.cs" />
-    <Compile Include="DeactivateBookWatcher.cs" />
-    <Compile Include="DeactivateSheetWatcher.cs" />
-    <Compile Include="DeleteSheetWatcher.cs" />
-    <Compile Include="Functions.cs" />
-    <Compile Include="Globals.cs" />
-    <Compile Include="IFunctions.cs" />
-    <Compile Include="NewWorkbookWatcher.cs" />
-    <Compile Include="NewWorksheetWatcher.cs" />
-    <Compile Include="ReferenceIdKeeper_T.cs" />
-    <Compile Include="WorkbookOpenWatcher.cs" />
+    <Compile Include="Cell.cs" />
+    <Compile Include="Semantics.cs" />
+    <Compile Include="SpreadSim.cs" />
+    <Compile Include="Worksheet.cs" />
+    <GenerateParser Include="CommandParser.y" />
+    <Compile Include="..\..\..\build\CommandParser.cs">
+      <DependentUpon>CommandParser.y</DependentUpon>
+    </Compile>
+    <GenerateScanner Include="CommandScanner.lex" />
+    <Compile Include="..\..\..\build\CommandScanner.cs">
+      <DependentUpon>CommandScanner.lex</DependentUpon>
+    </Compile>
   </ItemGroup>
-  <ItemGroup>
-    <Reference Include="Extensibility, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="Microsoft.Office.Interop.Excel, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
-      <EmbedInteropTypes>True</EmbedInteropTypes>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Windows.Forms" />
-  </ItemGroup>
+  <PropertyGroup>
+    <BuildDependsOn>GenerateParsers;$(BuildDependsOn)</BuildDependsOn>
+    <BuildDependsOn>GenerateScanners;$(BuildDependsOn)</BuildDependsOn>
+  </PropertyGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
       <Visible>False</Visible>
@@ -101,9 +110,19 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CreamCheese\CreamCheese.csproj">
+    <Reference Include="QUT.ShiftReduceParser">
+      <HintPath>..\..\..\lib\QUT.ShiftReduceParser.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\main\CreamCheese\CreamCheese.csproj">
       <Project>{7FF4E046-9229-43F7-8F12-945510FEC0BB}</Project>
       <Name>CreamCheese</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\main\FormulaParser\FormulaParser.csproj">
+      <Project>{AD5FA9BB-79D0-4A89-ACA6-4A6E97587779}</Project>
+      <Name>FormulaParser</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>

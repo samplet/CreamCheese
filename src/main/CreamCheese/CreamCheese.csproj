@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -9,8 +9,8 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>CreamCheese</RootNamespace>
-    <AssemblyName>ConstraintParser</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <AssemblyName>CreamCheese</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
     <FileUpgradeFlags>
@@ -39,7 +39,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>..\..\..\build\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -47,7 +47,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>..\..\..\build\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -60,45 +60,15 @@
   <Target Name="AfterBuild">
   </Target>
   -->
-  <Target Name="GenerateParsers" Inputs="@(GenerateParser)" Outputs="@(GenerateParser->'%(Filename).cs')">
-    <Exec Command="gppg.exe /gplex @(GenerateParser) &gt; ConstraintParser\%(GenerateParser.Filename).cs" />
-    <Touch Files="ConstraintParser\%(GenerateParser.Filename).cs" />
-  </Target>
-  <Target Name="GenerateScanners" Inputs="@(GenerateScanner)" Outputs="@(GenerateScanner->'%(Filename).cs')">
-    <Exec Command="gplex.exe /out:ConstraintParser\%(GenerateScanner.Filename).cs @(GenerateScanner)" />
-    <Touch Files="ConstraintParser\%(GenerateScanner.Filename).cs" />
-  </Target>
   <ItemGroup>
     <Compile Include="Cell.cs" />
-    <Compile Include="ConstraintParser\ExpressionTreeEnumerable.cs" />
-    <Compile Include="ConstraintParser\ExpressionTreeEnumerator.cs" />
-    <Compile Include="ConstraintParser\ExpressionTreeNode.cs" />
-    <Compile Include="ConstraintParser\ExpressionTree.cs" />
-    <Compile Include="ConstraintParser\FunctionToken.cs" />
-    <Compile Include="ConstraintParser\IToken.cs" />
-    <Compile Include="ConstraintParser\NumberToken.cs" />
-    <Compile Include="ConstraintParser\OperatorToken.cs" />
-    <Compile Include="ConstraintParser\RangeToken.cs" />
-    <Compile Include="ConstraintParser\ShiftReduceParserCode.cs" />
-    <Compile Include="ConstraintParser\StringToken.cs" />
-    <Compile Include="ConstraintParser\TokenType.cs" />
-    <Compile Include="ConstraintParser\UnknownToken.cs" />
-    <Compile Include="CspItemType.cs" />
-    <Compile Include="VariableCspItem.cs" />
-    <Compile Include="ConstraintCspItem.cs" />
-    <Compile Include="ICspItem.cs" />
-    <Compile Include="NumberCspItem.cs" />
-    <GenerateParser Include="ConstraintParser\Parser.y" />
-    <Compile Include="ConstraintParser\Parser.cs">
-      <DependentUpon>Parser.y</DependentUpon>
-    </Compile>
-    <GenerateScanner Include="ConstraintParser\Scanner.lex" />
-    <Compile Include="ConstraintParser\Scanner.cs">
-      <DependentUpon>Scanner.lex</DependentUpon>
-    </Compile>
+    <Compile Include="SpreadSheet.cs" />
+    <Compile Include="CreamCheese.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CreamCheese.cs" />
+    <Compile Include="ConstraintParser\ConstraintToken.cs" />
+    <Compile Include="ConstraintParser\Semantics.cs" />
+    <Compile Include="ConstraintParser\VariableToken.cs" />
   </ItemGroup>
   <PropertyGroup>
     <PreBuildEvent>
@@ -106,19 +76,16 @@
     <PostBuildEvent>
     </PostBuildEvent>
   </PropertyGroup>
-  <PropertyGroup>
-    <BuildDependsOn>GenerateParsers;$(BuildDependsOn)</BuildDependsOn>
-    <BuildDependsOn>GenerateScanners;$(BuildDependsOn)</BuildDependsOn>
-  </PropertyGroup>
   <ItemGroup>
+    <Reference Include="HalfAndHalf">
+      <HintPath>..\..\..\lib\HalfAndHalf.dll</HintPath>
+    </Reference>
+    <Reference Include="QUT.ShiftReduceParser, Version=1.4.1.0, Culture=neutral, PublicKeyToken=402396ef6102baec, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\lib\QUT.ShiftReduceParser.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Windows.Forms" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Cream\Cream.csproj">
-      <Project>{D915FB60-2389-4DE1-BFA3-6D2BA30ACE0A}</Project>
-      <Name>Cream</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
@@ -136,5 +103,11 @@
       <ProductName>Windows Installer 3.1</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FormulaParser\FormulaParser.csproj">
+      <Project>{AD5FA9BB-79D0-4A89-ACA6-4A6E97587779}</Project>
+      <Name>FormulaParser</Name>
+    </ProjectReference>
   </ItemGroup>
 </Project>

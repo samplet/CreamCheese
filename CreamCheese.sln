@@ -4,6 +4,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CreamCheese", "src\main\Cre
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Excream", "src\main\Excream\Excream.csproj", "{079E4D08-2696-4B4C-93CF-225C732088B7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormulaParser", "src\main\FormulaParser\FormulaParser.csproj", "{AD5FA9BB-79D0-4A89-ACA6-4A6E97587779}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "main", "main", "{9045CD93-A1F7-42F5-BFB6-3025CBBBAEE1}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{00AB48A2-4D97-4D31-9C5C-52B1C7D160EF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpreadSim", "src\test\SpreadSim\SpreadSim.csproj", "{E40EA178-5F7C-4A74-9297-4F9A6BCDBAE4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,8 +26,22 @@ Global
 		{079E4D08-2696-4B4C-93CF-225C732088B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{079E4D08-2696-4B4C-93CF-225C732088B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{079E4D08-2696-4B4C-93CF-225C732088B7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AD5FA9BB-79D0-4A89-ACA6-4A6E97587779}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AD5FA9BB-79D0-4A89-ACA6-4A6E97587779}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AD5FA9BB-79D0-4A89-ACA6-4A6E97587779}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AD5FA9BB-79D0-4A89-ACA6-4A6E97587779}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E40EA178-5F7C-4A74-9297-4F9A6BCDBAE4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E40EA178-5F7C-4A74-9297-4F9A6BCDBAE4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E40EA178-5F7C-4A74-9297-4F9A6BCDBAE4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E40EA178-5F7C-4A74-9297-4F9A6BCDBAE4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{7FF4E046-9229-43F7-8F12-945510FEC0BB} = {9045CD93-A1F7-42F5-BFB6-3025CBBBAEE1}
+		{079E4D08-2696-4B4C-93CF-225C732088B7} = {9045CD93-A1F7-42F5-BFB6-3025CBBBAEE1}
+		{AD5FA9BB-79D0-4A89-ACA6-4A6E97587779} = {9045CD93-A1F7-42F5-BFB6-3025CBBBAEE1}
+		{E40EA178-5F7C-4A74-9297-4F9A6BCDBAE4} = {00AB48A2-4D97-4D31-9C5C-52B1C7D160EF}
 	EndGlobalSection
 EndGlobal
