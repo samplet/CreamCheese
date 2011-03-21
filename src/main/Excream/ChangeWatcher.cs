@@ -5,7 +5,7 @@ using Excel = Microsoft.Office.Interop.Excel;
 
 namespace Excream {
 
-    public class ChangeWatcher {
+    static class ChangeWatcher {
 
         public static void Change(Excel.Range target) {
             string address = target.get_Address((object) false, (object) false, Excel.XlReferenceStyle.xlA1, (object) false, Type.Missing);

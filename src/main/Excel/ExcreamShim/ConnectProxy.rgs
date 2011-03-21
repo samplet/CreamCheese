@@ -1,0 +1,49 @@
+HKCR
+{
+	Excream.Functions = s 'Excream'
+	{
+		CLSID = s '{f4389bd9-a9c7-496f-926a-bd8730a43a8a}'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove '{f4389bd9-a9c7-496f-926a-bd8730a43a8a}' = s 'Excream.Functions'
+		{
+			ProgID = s 'Excream.Functions'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Apartment'
+			}
+			Programmable
+		}
+	}
+}
+
+HKCU
+{
+	NoRemove Software
+	{
+		NoRemove Microsoft
+		{
+			NoRemove Office
+			{
+				NoRemove Excel
+				{
+					NoRemove Addins
+					{
+						ForceRemove Excream.Functions
+						{
+							val 'Description' = s 'Use Excream to solve constraints from within worksheet formulae'
+							val 'FriendlyName' = s 'Excream Constraint Solver'
+							val 'LoadBehavior' = d 3
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+
+
+
+

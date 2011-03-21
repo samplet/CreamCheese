@@ -1,0 +1,39 @@
+// ExcreamShim.idl 
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(1F3C907B-A9D2-4B98-BB95-36275C01B54E),
+	version(1.0),
+	helpstring("ExcreamShim 1.0 Type Library")
+]
+library ExcreamShimLib
+{
+	importlib("stdole2.tlb");
+
+	[
+		uuid(f4389bd9-a9c7-496f-926a-bd8730a43a8a),
+		helpstring("ConnectProxy Class")
+	]
+	coclass ConnectProxy
+	{
+		[default] interface IUnknown;
+	};
+
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
