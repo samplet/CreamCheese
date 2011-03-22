@@ -20,6 +20,16 @@ namespace SpreadSim {
     Semantics(Cell baseCell) : this(baseCell, null) {}
 
     protected override IToken
+    EvaluateComplexOperation(IToken x, Tokens o) {
+      throw new NotImplementedException();
+    }
+
+    protected override IToken
+    EvaluateComplexOperation(IToken x, IToken y, Tokens o) {
+      throw new NotImplementedException();
+    }
+
+    protected override IToken
     ResolveRange(RangeToken r) {
       if(_dependencies != null) {
         _dependencies.Add(r);

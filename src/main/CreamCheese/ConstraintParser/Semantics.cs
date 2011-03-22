@@ -21,6 +21,24 @@ namespace CreamCheese.ConstraintParser {
       _spreadSheet = spreadSheet;
     }
 
+    public override IToken
+    Function(string name, params IToken[] args) {
+      switch(name) {
+      case "CONSTRAIN":
+        foreach(IToken t in args) {
+          if(!(t is ConstraintToken)) {
+            if(!(t is IPrimitiveToken) ||
+               !((IPrimitiveToken) t).ToBoolean()) {
+              throw new ArgumentException();
+            }
+          }
+        }
+        return new NullToken();
+      default:
+        return base.Function(name, args);
+      }
+    }
+
     private Variable
     ConvertTokenToVariable(IToken n) {
       if(n is VariableToken) {
@@ -37,8 +55,8 @@ namespace CreamCheese.ConstraintParser {
       }
     }
 
-    private IToken
-    EvaluateVariableOperation(IToken n, Tokens o) {
+    protected override IToken
+    EvaluateComplexOperation(IToken n, Tokens o) {
       Variable vr;
       Variable vn = ConvertTokenToVariable(n);
       switch(o) {
@@ -51,8 +69,8 @@ namespace CreamCheese.ConstraintParser {
       }
     }
 
-    private IToken
-    EvaluateVariableOperation(IToken x, IToken y, Tokens o) {
+    protected override IToken
+    EvaluateComplexOperation(IToken x, IToken y, Tokens o) {
       Variable vx = ConvertTokenToVariable(x);
       Variable vy = ConvertTokenToVariable(y);
       Variable vr;

@@ -6,7 +6,7 @@ namespace FormulaParser {
 
   public abstract class SemanticsBase {
 
-    public IToken
+    public virtual IToken
     Function(string name, params IToken[] args) {
       return new StringToken("f(" + name + ")");
     }
@@ -25,7 +25,7 @@ namespace FormulaParser {
       if(n is IPrimitiveToken) {
         return EvaluateOperation((IPrimitiveToken) n, o);
       } else {
-        throw new ArgumentException();
+        return EvaluateComplexOperation(n, o);
       }
     }
 
@@ -37,7 +37,7 @@ namespace FormulaParser {
         return EvaluateOperation((IPrimitiveToken) x,
                                  (IPrimitiveToken) y, o);
       } else {
-        throw new ArgumentException();
+        return EvaluateComplexOperation(x, y, o);
       }
     }
 
@@ -52,6 +52,9 @@ namespace FormulaParser {
         throw new ArgumentException("Unknown Operator");
       }
     }
+
+    protected abstract IToken
+    EvaluateComplexOperation(IToken x, Tokens o);
 
     protected IPrimitiveToken
     EvaluateOperation(IPrimitiveToken x, IPrimitiveToken y, Tokens o) {
@@ -84,6 +87,9 @@ namespace FormulaParser {
         throw new ArgumentException("Unknown Operator");
       }
     }
+
+    protected abstract IToken
+    EvaluateComplexOperation(IToken x, IToken y, Tokens o);
 
     protected abstract IToken
     ResolveRange(RangeToken r);

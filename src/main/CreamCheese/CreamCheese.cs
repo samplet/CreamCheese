@@ -162,7 +162,7 @@ namespace CreamCheese {
       foreach(KeyValuePair<string, Cell> kvp in _cells) {
         CP.Semantics semantics =
           new CP.Semantics(kvp.Value, _cells, network, _spreadSheet);
-        FP.Parser fp = new FP.Parser(semantics);
+        FP.Parser fp = new FP.Parser(kvp.Value.Formula, semantics);
         fp.Parse();
       }
       Cream.Solver solver = new Cream.DefaultSolver(network);
