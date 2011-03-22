@@ -1,0 +1,5 @@
+Scanner.cs
+Parser.cs
+# Ignore auto-generated Visual Studio files
+obj/
+FormulaParser.csproj.user

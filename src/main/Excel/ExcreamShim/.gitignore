@@ -1,0 +1,4 @@
+ExcreamShim.h
+ExcreamShim_i.c
+# Ignore auto-generated Visual Studio files
+ExcreamShim.vcxproj.user

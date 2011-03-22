@@ -1,0 +1,5 @@
+CommandScanner.cs
+CommandParser.cs
+# Ignore auto-generated Visual Studio files
+obj/
+SpreadSim.csproj.user

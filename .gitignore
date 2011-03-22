@@ -1,0 +1,6 @@
+build/
+lib/
+# Ignore auto-generated Visual Studio files
+CreamCheese.opensdf
+CreamCheese.sdf
+CreamCheese.suo
